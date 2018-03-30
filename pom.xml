@@ -360,7 +360,10 @@
                 <version>2.2</version>
                 <configuration>
                     <server>tomcat-development-server</server>
-                    <port>9966</port>
+                    <url>http://10.0.1.104:8090/manager/text</url>
+                    <username>tomcat</username>
+                    <password>tomcat</password>
+                    <warFile>target/petclinic.war</warFile>
                     <path>/petclinic</path>
                 </configuration>
             </plugin>
