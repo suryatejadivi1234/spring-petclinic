@@ -359,12 +359,11 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <server>tomcat-development-server</server>
-                    <url>http://ec2-34-229-181-169.compute-1.amazonaws.com:8090</url>
-                    <username>tomcat</username>
-                    <password>tomcat</password>
-                    <warFile>target/petclinic.war</warFile>
-                    <path>/petclinic</path>
+                        <url>http://34.229.181.169:8090/manager/text</url>
+                        <username>tomcat</username>
+                        <password>tomcat</password>
+                        <warFile>target/petclinic.war</warFile>
+                        <path>/petclinic</path>
                 </configuration>
             </plugin>
             <plugin>
