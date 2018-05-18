@@ -15,6 +15,8 @@
  */
 package org.springframework.samples.petclinic.repository.jdbc;
 
+import java.util.List;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,9 +25,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.repository.VisitRepository;
 import org.springframework.stereotype.Repository;
-
-import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * A simple JDBC-based implementation of the {@link VisitRepository} interface.
@@ -41,48 +40,45 @@ import java.util.List;
 @Repository
 public class JdbcVisitRepositoryImpl implements VisitRepository {
 
-    private JdbcTemplate jdbcTemplate;
+  private JdbcTemplate jdbcTemplate;
 
-    private SimpleJdbcInsert insertVisit;
+  private SimpleJdbcInsert insertVisit;
 
-    @Autowired
-    public JdbcVisitRepositoryImpl(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+  @Autowired
+  public JdbcVisitRepositoryImpl(DataSource dataSource) {
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
 
-        this.insertVisit = new SimpleJdbcInsert(dataSource)
-            .withTableName("visits")
-            .usingGeneratedKeyColumns("id");
+    this.insertVisit =
+        new SimpleJdbcInsert(dataSource).withTableName("visits").usingGeneratedKeyColumns("id");
+  }
+
+  @Override
+  public void save(Visit visit) throws DataAccessException {
+    if (visit.isNew()) {
+      Number newKey = this.insertVisit.executeAndReturnKey(createVisitParameterSource(visit));
+      visit.setId(newKey.intValue());
+    } else {
+      throw new UnsupportedOperationException("Visit update not supported");
     }
+  }
 
+  /**
+   * Creates a {@link MapSqlParameterSource} based on data values from the supplied {@link Visit}
+   * instance.
+   */
+  private MapSqlParameterSource createVisitParameterSource(Visit visit) {
+    return new MapSqlParameterSource()
+        .addValue("id", visit.getId())
+        .addValue("visit_date", visit.getDate().toDate())
+        .addValue("description", visit.getDescription())
+        .addValue("pet_id", visit.getPet().getId());
+  }
 
-    @Override
-    public void save(Visit visit) throws DataAccessException {
-        if (visit.isNew()) {
-            Number newKey = this.insertVisit.executeAndReturnKey(
-                createVisitParameterSource(visit));
-            visit.setId(newKey.intValue());
-        } else {
-            throw new UnsupportedOperationException("Visit update not supported");
-        }
-    }
-
-
-    /**
-     * Creates a {@link MapSqlParameterSource} based on data values from the supplied {@link Visit} instance.
-     */
-    private MapSqlParameterSource createVisitParameterSource(Visit visit) {
-        return new MapSqlParameterSource()
-            .addValue("id", visit.getId())
-            .addValue("visit_date", visit.getDate().toDate())
-            .addValue("description", visit.getDescription())
-            .addValue("pet_id", visit.getPet().getId());
-    }
-
-    @Override
-    public List<Visit> findByPetId(Integer petId) {
-        return this.jdbcTemplate.query(
-            "SELECT id as visit_id, visit_date, description FROM visits WHERE pet_id=?",
-            new JdbcVisitRowMapper(), petId);
-    }
-
+  @Override
+  public List<Visit> findByPetId(Integer petId) {
+    return this.jdbcTemplate.query(
+        "SELECT id as visit_id, visit_date, description FROM visits WHERE pet_id=?",
+        new JdbcVisitRowMapper(),
+        petId);
+  }
 }

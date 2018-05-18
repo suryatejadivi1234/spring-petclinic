@@ -21,16 +21,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * <p> Integration test using the jdbc profile.
+ * Integration test using the jdbc profile.
  *
  * @author Thomas Risberg
  * @author Michael Isvy
- * @see AbstractClinicServiceTests AbstractClinicServiceTests for more details. </p>
+ * @see AbstractClinicServiceTests AbstractClinicServiceTests for more details.
  */
 @ContextConfiguration(locations = {"classpath:spring/business-config.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("jdbc")
-public class ClinicServiceJdbcTests extends AbstractClinicServiceTests {
-
-
-}
+public class ClinicServiceJdbcTests extends AbstractClinicServiceTests {}
